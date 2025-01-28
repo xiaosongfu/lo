@@ -3,6 +3,7 @@ package parallel
 import (
 	"sort"
 	"strconv"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,6 +23,18 @@ func TestMap(t *testing.T) {
 	is.Equal(len(result2), 4)
 	is.Equal(result1, []string{"Hello", "Hello", "Hello", "Hello"})
 	is.Equal(result2, []string{"1", "2", "3", "4"})
+}
+
+func TestForEach(t *testing.T) {
+	is := assert.New(t)
+
+	var counter uint64
+	collection := []int{1, 2, 3, 4}
+	ForEach(collection, func(x int, i int) {
+		atomic.AddUint64(&counter, 1)
+	})
+
+	is.Equal(uint64(4), atomic.LoadUint64(&counter))
 }
 
 func TestTimes(t *testing.T) {
@@ -55,6 +68,13 @@ func TestGroupBy(t *testing.T) {
 		1: {1, 4},
 		2: {2, 5},
 	})
+
+	type myStrings []string
+	allStrings := myStrings{"", "foo", "bar"}
+	nonempty := GroupBy(allStrings, func(i string) int {
+		return 42
+	})
+	is.IsType(nonempty[42], allStrings, "type preserved")
 }
 
 func TestPartitionBy(t *testing.T) {
@@ -84,4 +104,11 @@ func TestPartitionBy(t *testing.T) {
 
 	is.ElementsMatch(result1, [][]int{{-2, -1}, {0, 2, 4}, {1, 3, 5}})
 	is.Equal(result2, [][]int{})
+
+	type myStrings []string
+	allStrings := myStrings{"", "foo", "bar"}
+	nonempty := PartitionBy(allStrings, func(item string) int {
+		return len(item)
+	})
+	is.IsType(nonempty[0], allStrings, "type preserved")
 }
