@@ -7,7 +7,9 @@ import (
 )
 
 func TestRange(t *testing.T) {
+	t.Parallel()
 	is := assert.New(t)
+
 	result1 := Range(4)
 	result2 := Range(-4)
 	result3 := Range(0)
@@ -17,7 +19,9 @@ func TestRange(t *testing.T) {
 }
 
 func TestRangeFrom(t *testing.T) {
+	t.Parallel()
 	is := assert.New(t)
+
 	result1 := RangeFrom(1, 5)
 	result2 := RangeFrom(-1, -5)
 	result3 := RangeFrom(10, 0)
@@ -31,7 +35,9 @@ func TestRangeFrom(t *testing.T) {
 }
 
 func TestRangeClose(t *testing.T) {
+	t.Parallel()
 	is := assert.New(t)
+
 	result1 := RangeWithSteps(0, 20, 6)
 	result2 := RangeWithSteps(0, 3, -5)
 	result3 := RangeWithSteps(1, 1, 0)
@@ -47,6 +53,7 @@ func TestRangeClose(t *testing.T) {
 }
 
 func TestClamp(t *testing.T) {
+	t.Parallel()
 	is := assert.New(t)
 
 	result1 := Clamp(0, -10, 10)
@@ -58,16 +65,109 @@ func TestClamp(t *testing.T) {
 	is.Equal(result3, 10)
 }
 
+func TestSum(t *testing.T) {
+	is := assert.New(t)
+
+	result1 := Sum([]float32{2.3, 3.3, 4, 5.3})
+	result2 := Sum([]int32{2, 3, 4, 5})
+	result3 := Sum([]uint32{2, 3, 4, 5})
+	result4 := Sum([]uint32{})
+	result5 := Sum([]complex128{4_4, 2_2})
+
+	is.Equal(result1, float32(14.900001))
+	is.Equal(result2, int32(14))
+	is.Equal(result3, uint32(14))
+	is.Equal(result4, uint32(0))
+	is.Equal(result5, complex128(6_6))
+}
+
 func TestSumBy(t *testing.T) {
+	t.Parallel()
 	is := assert.New(t)
 
 	result1 := SumBy([]float32{2.3, 3.3, 4, 5.3}, func(n float32) float32 { return n })
 	result2 := SumBy([]int32{2, 3, 4, 5}, func(n int32) int32 { return n })
 	result3 := SumBy([]uint32{2, 3, 4, 5}, func(n uint32) uint32 { return n })
 	result4 := SumBy([]uint32{}, func(n uint32) uint32 { return n })
+	result5 := SumBy([]complex128{4_4, 2_2}, func(n complex128) complex128 { return n })
 
 	is.Equal(result1, float32(14.900001))
 	is.Equal(result2, int32(14))
 	is.Equal(result3, uint32(14))
+	is.Equal(result4, uint32(0))
+	is.Equal(result5, complex128(6_6))
+}
+
+func TestProduct(t *testing.T) {
+	is := assert.New(t)
+
+	result1 := Product([]float32{2.3, 3.3, 4, 5.3})
+	result2 := Product([]int32{2, 3, 4, 5})
+	result3 := Product([]int32{7, 8, 9, 0})
+	result4 := Product([]int32{7, -1, 9, 2})
+	result5 := Product([]uint32{2, 3, 4, 5})
+	result6 := Product([]uint32{})
+	result7 := Product([]complex128{4_4, 2_2})
+	result8 := Product[uint32](nil)
+
+	is.Equal(result1, float32(160.908))
+	is.Equal(result2, int32(120))
+	is.Equal(result3, int32(0))
+	is.Equal(result4, int32(-126))
+	is.Equal(result5, uint32(120))
+	is.Equal(result6, uint32(1))
+	is.Equal(result7, complex128(96_8))
+	is.Equal(result8, uint32(1))
+}
+
+func TestProductBy(t *testing.T) {
+	is := assert.New(t)
+
+	result1 := ProductBy([]float32{2.3, 3.3, 4, 5.3}, func(n float32) float32 { return n })
+	result2 := ProductBy([]int32{2, 3, 4, 5}, func(n int32) int32 { return n })
+	result3 := ProductBy([]int32{7, 8, 9, 0}, func(n int32) int32 { return n })
+	result4 := ProductBy([]int32{7, -1, 9, 2}, func(n int32) int32 { return n })
+	result5 := ProductBy([]uint32{2, 3, 4, 5}, func(n uint32) uint32 { return n })
+	result6 := ProductBy([]uint32{}, func(n uint32) uint32 { return n })
+	result7 := ProductBy([]complex128{4_4, 2_2}, func(n complex128) complex128 { return n })
+	result8 := ProductBy(nil, func(n uint32) uint32 { return n })
+
+	is.Equal(result1, float32(160.908))
+	is.Equal(result2, int32(120))
+	is.Equal(result3, int32(0))
+	is.Equal(result4, int32(-126))
+	is.Equal(result5, uint32(120))
+	is.Equal(result6, uint32(1))
+	is.Equal(result7, complex128(96_8))
+	is.Equal(result8, uint32(1))
+}
+
+func TestMean(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	result1 := Mean([]float32{2.3, 3.3, 4, 5.3})
+	result2 := Mean([]int32{2, 3, 4, 5})
+	result3 := Mean([]uint32{2, 3, 4, 5})
+	result4 := Mean([]uint32{})
+
+	is.Equal(result1, float32(3.7250001))
+	is.Equal(result2, int32(3))
+	is.Equal(result3, uint32(3))
+	is.Equal(result4, uint32(0))
+}
+
+func TestMeanBy(t *testing.T) {
+	t.Parallel()
+	is := assert.New(t)
+
+	result1 := MeanBy([]float32{2.3, 3.3, 4, 5.3}, func(n float32) float32 { return n })
+	result2 := MeanBy([]int32{2, 3, 4, 5}, func(n int32) int32 { return n })
+	result3 := MeanBy([]uint32{2, 3, 4, 5}, func(n uint32) uint32 { return n })
+	result4 := MeanBy([]uint32{}, func(n uint32) uint32 { return n })
+
+	is.Equal(result1, float32(3.7250001))
+	is.Equal(result2, int32(3))
+	is.Equal(result3, uint32(3))
 	is.Equal(result4, uint32(0))
 }
